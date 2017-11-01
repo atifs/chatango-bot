@@ -1,2 +1,2 @@
-# simple-chatango-bot
-A bot for testing made in Python 3.6 using ch.py
+# chatango-bot
+A bot made in Python 3.6 using ch.py

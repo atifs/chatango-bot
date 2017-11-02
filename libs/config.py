@@ -3,10 +3,6 @@ import json
 rooms = []
 auth  = {}
 
-def load_all():
-    load_auth()
-    load_rooms()
-
 def load_auth():
     global auth
     with open("config/auth.json") as file:
@@ -15,16 +11,13 @@ def load_auth():
 
 def load_rooms():
     global rooms
+    rooms.clear()
     with open("config/rooms.txt") as file:
         for line in file:
-            for room in line.split():
-                rooms.append(room)
-
-def save_all():
-    save_rooms(50)
+            rooms.extend(line.split())
 
 def save_rooms(room_per_line):
-    with open("config/rooms.txt") as file:
+    with open("config/rooms.txt", "w") as file:
         for i, room in enumerate(rooms):
             if i % room_per_line == 0:
                 file.write("\n")
@@ -32,3 +25,10 @@ def save_rooms(room_per_line):
                 file.write(room)
             else:
                 file.write(room + " ")
+
+def load_all():
+    load_auth()
+    load_rooms()
+
+def save_all():
+    save_rooms(50)

@@ -787,11 +787,11 @@ class Room:
     """Authenticate."""
     # login as name with password
     if self.mgr.name and self.mgr.password:
-      self._sendCommand("bauth", self.name, self._uid, self.mgr.name, self.mgr.password)
+      self._sendCommand("bauth", self.name, "", self.mgr.name, self.mgr.password)
       self._currentname = self.mgr.name
     # login as anon
     else:
-      self._sendCommand("bauth", self.name)
+      self._sendCommand("bauth", self.name, "", "", "")
 
     self._setWriteLock(True)
 
@@ -1553,11 +1553,8 @@ class RoomManager:
     self._rooms = dict()
     self._rooms_queue = queue.Queue()
     self._rooms_lock = threading.Lock()
-    if pm:
-      if self._password:
+    if pm and password:
         self._pm = self._PM(mgr = self)
-      else:
-        self._pm = self._ANON_PM(mgr = self)
     else:
       self._pm = None
 
@@ -2162,24 +2159,25 @@ class RoomManager:
       conns = self.getConnections()
       socks = [x._sock for x in conns]
       wsocks = [x._sock for x in conns if x._wbuf != b""]
-      rd, wr, sp = select.select(socks, wsocks, [], self._TimerResolution)
-      for sock in rd:
-        con = [c for c in conns if c._sock == sock][0]
-        try:
-          data = sock.recv(1024)
-          if(len(data) > 0):
-            con._feed(data)
-          else:
-            con.disconnect()
-        except socket.error:
-          pass
-      for sock in wr:
-        con = [c for c in conns if c._sock == sock][0]
-        try:
-          size = sock.send(con._wbuf)
-          con._wbuf = con._wbuf[size:]
-        except socket.error:
-          pass
+      if socks or wsocks:
+          rd, wr, sp = select.select(socks, wsocks, [], self._TimerResolution)
+          for sock in rd:
+            con = [c for c in conns if c._sock == sock][0]
+            try:
+              data = sock.recv(1024)
+              if(len(data) > 0):
+                con._feed(data)
+              else:
+                con.disconnect()
+            except socket.error:
+              pass
+          for sock in wr:
+            con = [c for c in conns if c._sock == sock][0]
+            try:
+              size = sock.send(con._wbuf)
+              con._wbuf = con._wbuf[size:]
+            except socket.error:
+              pass
       self._tick()
 
   @classmethod

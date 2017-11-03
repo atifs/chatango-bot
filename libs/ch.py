@@ -704,6 +704,9 @@ class Room:
   ####
   # Init
   ####
+  def __repr__(self):
+      return f"<Room: {self._name}>"
+
   def __init__(self, room, uid = None, server = None, port = None, mgr = None):
     """init, don't overwrite"""
     # Basic stuff
@@ -2160,7 +2163,7 @@ class RoomManager:
       socks = [x._sock for x in conns]
       wsocks = [x._sock for x in conns if x._wbuf != b""]
       if socks or wsocks:
-          rd, wr, sp = select.select(socks, wsocks, [], self._TimerResolution)
+          rd, wr, sp = select.select(socks, wsocks, socks, self._TimerResolution)
           for sock in rd:
             con = [c for c in conns if c._sock == sock][0]
             try:
@@ -2178,6 +2181,10 @@ class RoomManager:
               con._wbuf = con._wbuf[size:]
             except socket.error:
               pass
+          for sock in sr:
+            con = [c for c in conns if c._sock == sock][0]
+            if debug:
+                print(con)
       self._tick()
 
   @classmethod

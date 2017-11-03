@@ -1,3 +1,5 @@
+import sys
+import sys
 
 def arguments(*args, **kwargs):
     args = ", ".join(repr(x) for x in args)
@@ -8,8 +10,8 @@ def arguments(*args, **kwargs):
 
 def event(func):
     def wraper(*args, **kwargs):
-        print(f"{func.__name__}{arguments(*args, **kwargs)}", end=" -> ")
+        print(f"{func.__name__}{arguments(*args, **kwargs)}", end=" -> ", file=sys.stderr)
         r = func(*args, *kwargs)
-        print(r)
+        print(r, file=sys.stderr)
         return r
     return wraper

@@ -1,10 +1,9 @@
 from libs import bot, config
 
 
-
 def main():
     config.load_all()
-    my_bot = bot.Bot(config.auth["name"], config.auth["password"], False)
+    my_bot = bot.Bot(config.auth["name"], config.auth["password"], config.auth["pm"])
     for room in config.rooms:
         my_bot.joinRoom(room)
     try:

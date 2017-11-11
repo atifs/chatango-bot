@@ -1218,7 +1218,7 @@ class Room:
     if msg==None:
       return
     if "\n" in msg:
-        msg.replace("\n", "\r")
+        msg = msg.replace("\n", "\r")
     msg = msg.rstrip()
     if not html:
       msg = msg.replace("<", "&lt;").replace(">", "&gt;")

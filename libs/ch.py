@@ -2181,7 +2181,7 @@ class RoomManager:
               con._wbuf = con._wbuf[size:]
             except socket.error:
               pass
-          for sock in sr:
+          for sock in sp:
             con = [c for c in conns if c._sock == sock][0]
             if debug:
                 print(con)

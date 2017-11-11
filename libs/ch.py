@@ -1061,6 +1061,7 @@ class Room:
     message = ":".join(args[4:])
     if self._crearing_all:
         self._sendCommand("updateannouncement", active, seconds, message)
+        self._crearing_all = False
 
   def _rcmd_g_participants(self, args):
     args = ":".join(args)

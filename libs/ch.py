@@ -1191,7 +1191,7 @@ class Room:
     if not self._silent:
       self._sendCommand("bmsg:tl2r", msg)
 
-  def message(self, msg, *, html = False, channels = None, badge = None):
+  def message(self, msg, html = False, *, channels = None, badge = None):
     """
     Send a message. (Use "\n" for new line)
 

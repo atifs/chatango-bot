@@ -541,6 +541,7 @@ class PM:
       self._blocklist.add(User(name))
 
   def _rcmd_idleupdate(self, args):
+    # FIX
     user = User(args[0])
     last_on, is_on, idle = self._status[user]
     if args[1] == '1':

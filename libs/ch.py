@@ -717,6 +717,7 @@ class Room:
     self._mgr = mgr
 
     # Under the hood
+    self._crearing_all = False
     self._connected = False
     self._reconnecting = False
     self._uid = uid or _genUid()
@@ -1053,6 +1054,14 @@ class Room:
     )
     self._i_log.append(msg)
 
+  def _rcmd_getannc(self, args):
+    active = args[0]
+    room  = args[1]
+    seconds = args[3]
+    message = ":".join(args[4:])
+    if self._crearing_all:
+        self._sendCommand("updateannouncement", active, seconds, message)
+
   def _rcmd_g_participants(self, args):
     args = ":".join(args)
     args = args.split(";")
@@ -1346,9 +1355,11 @@ class Room:
     return False
 
   def clearall(self):
-    """Clear all messages. (Owner only)"""
-    if self.getLevel(self.user) == 2:
-      self._sendCommand("clearall")
+    """Clear all messages. (Mods only)"""
+    if self.getLevel(self.user) == 0: return
+    self._sendCommand("clearall")
+    self._sendCommand("getannouncement")
+    self._crearing_all = True
 
   def rawBan(self, name, ip, unid):
     """

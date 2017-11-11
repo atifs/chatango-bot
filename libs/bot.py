@@ -12,6 +12,7 @@ class Bot(ch.RoomManager):
     @event
     def onConnect(self, room):
         print(f"Connected to {room.name}")
+        room.clearall()
         #room.message("<i>test</i>", channels = ("red", "blue"), html = True)
 
     @event

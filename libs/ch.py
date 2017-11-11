@@ -706,7 +706,7 @@ class Room:
   # Init
   ####
   def __repr__(self):
-      return f"<Room: {self._name}>"
+      return "<%s: %s>" % (self.__class__.__name__, self._name)
 
   def __init__(self, room, uid = None, server = None, port = None, mgr = None):
     """init, don't overwrite"""
@@ -1557,6 +1557,9 @@ class RoomManager:
   _maxLength = 1800
   _maxHistoryLength = 150
 
+  def __repr__(self):
+    return "<%s: %s>" % (self.__class__.__name__, self.user.name)
+
   ####
   # Init
   ####
@@ -2384,7 +2387,7 @@ class _User:
   # Repr
   ####
   def __repr__(self):
-    return "<User: %s>" %(self.name)
+    return "<%s: %s>" % (self.__class__.__name__, self.name)
 
 ################################################################
 # Message class
@@ -2469,3 +2472,5 @@ class Message:
   unid = property(_getUnid)
   puid = property(_getPuid)
   uid = property(_getPuid) # other library use uid so we create an alias
+  def __repr__(self):
+    return "<%s: user = %s room = %s>" % (self.__class__.__name__, self.user.name, self.room.name)

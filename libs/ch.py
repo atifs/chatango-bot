@@ -2474,4 +2474,4 @@ class Message:
   puid = property(_getPuid)
   uid = property(_getPuid) # other library use uid so we create an alias
   def __repr__(self):
-    return "<%s: user = %s room = %s>" % (self.__class__.__name__, self.user.name, self.room.name)
+    return "<%s: user = %s room = %s>" % (self.__class__.__name__, repr(self.user), repr(self.room))

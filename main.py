@@ -1,6 +1,5 @@
 from libs import bot, config
 
-
 def main():
     config.load_all()
     my_bot = bot.Bot(config.auth["name"], config.auth["password"], config.auth["pm"])
@@ -13,4 +12,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    input()

@@ -1,8 +1,12 @@
 from . import ch
+from . import config
+
 from .utils import event
+
 import traceback
 import html
-ch.debug = True
+
+PREFIX = "->"
 
 class Bot(ch.RoomManager):
     @event
@@ -11,27 +15,22 @@ class Bot(ch.RoomManager):
 
     @event
     def onConnect(self, room):
-        print(f"Connected to {room.name}")
-        room.clearall()
-        #room.message("<i>test</i>", channels = ("red", "blue"), html = True)
+        pass
 
     @event
     def onMessage(self, room, user, message):
-        if user == self.user:
-            return
-        if message.body.startswith("->"):
-            cmd, *args = message.body[2:].split()
-        else:
-            return
+        if user == self.user: return
 
-        if user.name == "theclonerx" and cmd == "eval":
-            try:
-                room.message(repr(eval(" ".join(args))))
-            except BaseException as e:
-                room.message(f'<f x14F00="8"><b>{e.__class__.__name__}</b>: <i>{html.escape(str(e))}</i>', channels=("red",), html=True)
+        if not message.body.strip(): return
 
-    # @event
-    # def onEventCalled(self, room, event, *args, **kwargs):
-    #     pass
+        cmd, *args = message.body.split()
 
-   
+        if cmd[:len(PREFIX)] != PREFIX: return
+        else: cmd = cmd[len(PREFIX):]
+
+        if cmd not in config.cmds: return
+
+        try:
+            exec(config.cmds[cmd])
+        except BaseException as e:
+            room.message(f'<f x{str(self.user.fontSize).rjust(2, "0")}F00="{self.user.fontFace}"><b>{e.__class__.__name__}</b>: <f x{str(self.user.fontSize).rjust(2, "0")}F00="8"><i>{html.escape(str(e))}</i>', channels=("red",), html=True)

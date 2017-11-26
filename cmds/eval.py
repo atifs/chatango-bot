@@ -1,3 +1,3 @@
 
 if user.name == "theclonerx":
-	eval(" ".join(args))
+	room.message(repr(eval(" ".join(args))))

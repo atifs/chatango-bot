@@ -26,7 +26,7 @@ class Bot(ch.RoomManager):
         cmd, *args = message.body.split()
 
         if cmd[:len(PREFIX)] != PREFIX: return
-        else: cmd = cmd[len(PREFIX):]
+        else: cmd = cmd[len(PREFIX):].lower()
 
         if cmd not in config.cmds: return
 

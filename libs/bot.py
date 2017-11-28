@@ -7,23 +7,31 @@ import traceback
 import html
 
 PREFIX = "->"
-
+if __import__("os").name == "posix":
+    device = "Linux"
+else:
+    device = "Windows"
 class Bot(ch.RoomManager):
-    @event
     def onInit(self):
-        pass
-
-    @event
+        print("Im {}, your bot... Running on {}, V-{}.\r".format(config.auth["name"], device, config.auth["ver"]))
+        print(" ")
+        
     def onConnect(self, room):
-        pass
-
-    @event
+        print("Joining to "+room.name)
+        
     def onMessage(self, room, user, message):
+        print("[{}] <{}>: {}".format(room.name, user.name, message.body))
         if user == self.user: return
 
         if not message.body.strip(): return
+        msgdata = message.body.split(" ",1)
+        if len(msgdata) > 1:
+            cmd, args = msgdata[0], msgdata[1]
+        else:
+            cmd, args = msgdata[0],""
+            cmd = cmd.lower()
 
-        cmd, *args = message.body.split()
+        
 
         if cmd[:len(PREFIX)] != PREFIX: return
         else: cmd = cmd[len(PREFIX):].lower()

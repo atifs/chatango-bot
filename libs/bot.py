@@ -20,7 +20,7 @@ class Bot(ch.RoomManager):
         print("Joining to "+room.name)
         
     def onMessage(self, room, user, message):
-        print("[{}] <{}>: {}".format(room.name, user.name, message.body))
+        self.safePrint("[{}] <{}>: {}".format(room.name, user.name, message.body))
         if user == self.user: return
 
         if not message.body.strip(): return

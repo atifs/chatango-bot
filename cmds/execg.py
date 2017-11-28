@@ -1,3 +1,3 @@
 if user.name in ["yadokun", "theclonerx"]:
-    room.message(repr(exec(" ".join(args), globals())))
+    room.message(str(exec(args, globals())))
 

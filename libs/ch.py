@@ -970,7 +970,7 @@ class Room:
     ip = args[6]
     name = args[1]
     print(args[7])
-    channels = tuple(x for x, y in Channels.items() if int(args[7]) & y == y and y != 0) or ("white")
+    channels = tuple(x for x, y in Channels.items() if int(args[7]) & y == y and y != 0) or ("white",)
     print(channels)
     rawmsg = ":".join(args[9:])
     msg, n, f = _clean_message(rawmsg)

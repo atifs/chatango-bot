@@ -1015,6 +1015,8 @@ class Room:
       del self._mqueue[args[0]]
       msg.attach(self, args[1])
       self._addHistory(msg)
+      if any(x in msg.channels for x in ("staff", "shield")) and self.owner != msg.user:
+        self._mods.add(msg.user)
       self._callEvent("onMessage", msg.user, msg)
 
   def _rcmd_i(self, args):

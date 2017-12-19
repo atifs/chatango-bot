@@ -2436,6 +2436,7 @@ class Message:
     self._user = None
     self._body = None
     self._room = None
+    self.channels = ("white",)
     self._raw = ""
     self._ip = None
     self._unid = ""

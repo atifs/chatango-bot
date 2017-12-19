@@ -2309,6 +2309,7 @@ def User(name, *args, **kw):
   if not user:
     user = _User(name = name, *args, **kw)
     _users[name] = user
+  user.capser = name
   return user
 
 class _User:
@@ -2318,6 +2319,7 @@ class _User:
   ####
   def __init__(self, name, **kw):
     self._name = name.lower()
+    self._capser = name
     self._sids = dict()
     self._msgs = list()
     self._nameColor = "000"
@@ -2345,15 +2347,18 @@ class _User:
   def _getFontFace(self): return self._fontFace
   def _getFontSize(self): return self._fontSize
   def _getNameColor(self): return self._nameColor
+  def _getCapser(self): return self._capser
+  def _setCapser(self, val): self._capser = val
 
-  name = property(_getName)
+  name       = property(_getName)
+  capser     = property(_getCapser, _setCapser)
   sessionids = property(_getSessionIds)
-  rooms = property(_getRooms)
-  roomnames = property(_getRoomNames)
-  fontColor = property(_getFontColor)
-  fontFace = property(_getFontFace)
-  fontSize = property(_getFontSize)
-  nameColor = property(_getNameColor)
+  rooms      = property(_getRooms)
+  roomnames  = property(_getRoomNames)
+  fontColor  = property(_getFontColor)
+  fontFace   = property(_getFontFace)
+  fontSize   = property(_getFontSize)
+  nameColor  = property(_getNameColor)
 
   ####
   # Util
@@ -2460,6 +2465,7 @@ class Message:
   def _getRaw(self): return self._raw
   def _getUnid(self): return self._unid
   def _getPuid(self): return self._puid
+  
 
   msgid = property(_getId)
   time = property(_getTime)

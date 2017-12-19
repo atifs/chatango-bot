@@ -400,6 +400,9 @@ class PM:
     self._pingTask = None
     self._connect()
 
+  def __repr__(self):
+    return "<%s: %s>" % (self.__class__.__name__, repr(self._mgr))
+
   ####
   # Connections
   ####
@@ -969,7 +972,7 @@ class Room:
     puid = args[3]
     ip = args[6]
     name = args[1]
-    channels = tuple(x for x, y in Channels.items() if int(args[7]) & y == y and y != 0) or ("white",)
+    channels = tuple(x for x, y in Channels.items() if int(args[7]) & y == y and y != 0) or ()
     rawmsg = ":".join(args[9:])
     msg, n, f = _clean_message(rawmsg)
     if name == "":
@@ -2085,6 +2088,8 @@ class RoomManager:
   # Scheduling
   ####
   class _Task:
+    def __repr__(self):
+      return "<%s: isInterval=%s, %s>" % (self.__class__.__name__, repr(self.isInterval) if hasattr(self, "isInterval") else "False", time.strftime("%X", time.localtime(self.target)) if hasattr(self, "target") else "???")
     def cancel(self):
       """Sugar for removeTask."""
       self.mgr.removeTask(self)
@@ -2436,7 +2441,7 @@ class Message:
     self._user = None
     self._body = None
     self._room = None
-    self.channels = ("white",)
+    self.channels = ()
     self._raw = ""
     self._ip = None
     self._unid = ""

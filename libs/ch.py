@@ -2324,7 +2324,7 @@ class _User:
   ####
   def __init__(self, name, **kw):
     self._name = name.lower()
-    self._capser = name
+    self._capser = name if name and name[0] not in "#!" else name[1:]
     self._sids = dict()
     self._msgs = list()
     self._nameColor = "000"

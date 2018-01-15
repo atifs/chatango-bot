@@ -192,7 +192,10 @@ def _parseFont(f):
   if not match:
     return None, None, None
   else:
-    return (match["color"], match["font"], int(match["size"]))
+    color = match.groups("color")[0] if match.groups("color") else None
+    font  = match.groups("font") [0] if match.groups("font") else None
+    size  = match.groups("size") [0] if match.groups("size") else None
+    return (color, font, int(size))
 
 ################################################################
 # Anon id
@@ -2314,7 +2317,8 @@ def User(name, *args, **kw):
   if not user:
     user = _User(name = name, *args, **kw)
     _users[name] = user
-  user.capser = name
+  if not name.islower():
+    user.capser = name
   return user
 
 class _User:

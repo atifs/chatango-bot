@@ -549,11 +549,17 @@ class PM:
   def _rcmd_idleupdate(self, args):
     # FIX
     user = User(args[0])
-    last_on, is_on, idle = self._status[user]
-    if args[1] == '1':
-      self._status[user] = [last_on, is_on, 0]
+    if user in self._status:
+      last_on, is_on, idle = self._status[user]
+      if args[1] == '1':
+        self._status[user] = [last_on, is_on, 0]
+      else:
+        self._status[user] = [last_on, is_on, time.time()]
     else:
-      self._status[user] = [last_on, is_on, time.time()]
+        last_on = 0
+        is_on   = True
+        idle    = 0
+        self._status[user] = [last_on, is_on, 0] 
 
   def _rcmd_track(self, args):
     user = User(args[0])

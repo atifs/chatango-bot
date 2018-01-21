@@ -260,3 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 libs/__pycahe__/
+config/auth.json
+*.pyc

@@ -1,3 +1,3 @@
 
 if user.name == "theclonerx":
-	room.message(str(eval(args)))
+    room.message(repr(eval(args)))

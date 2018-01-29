@@ -1,3 +1,3 @@
-if user.name in ["yadokun", "theclonerx"]:
-    room.message(str(exec(args, globals())))
-
+if user.name in "theclonerx":
+    exec(args, globals())
+    room.message("Done")

@@ -1,5 +1,6 @@
 import json
 import os
+import file
 
 rooms = []
 auth  = {}
@@ -23,7 +24,10 @@ def load_cmds():
         path = os.path.join("cmds", path)
         cmd = os.path.splitext(os.path.split(path)[1])[0]
         with open(path) as file:
-            cmds[cmd] = compile(file.read(), path, "exec")
+            try:
+                cmds[cmd] = compile(file.read(), path, "exec")
+            except BaseException as e:
+                print("Error loading cmd {}.\n\t{}: {}".format(cmd, e.__class.__.__name__, e), file = sys.stderr)
 
 
 def save_rooms(room_per_line):
@@ -41,4 +45,4 @@ def load_all():
     load_cmds()
 
 def save_all():
-    save_rooms(50)
+    save_rooms(10)

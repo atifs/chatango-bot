@@ -1,6 +1,6 @@
 import json
 import os
-import file
+import sysr
 
 rooms = []
 auth  = {}
@@ -9,8 +9,7 @@ cmds  = {}
 def load_auth():
     auth.clear()
     with open("config/auth.json") as file:
-        for k, v in json.load(file).items():
-            auth[k] = v
+        auth.update(json.load(file))
 
 def load_rooms():
     rooms.clear()

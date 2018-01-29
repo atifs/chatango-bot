@@ -6,37 +6,43 @@ from .utils import event
 import traceback
 import html
 
-PREFIX = "->"
-if __import__("os").name == "posix":
-    device = "Linux"
-else:
-    device = "Windows"
+PREFIX = "->" # you can also mention the bot instead of using the prefix
+
 class Bot(ch.RoomManager):
+    @event
     def onInit(self):
-        print("Im {}, your bot... Running on {}, V-{}.\r".format(config.auth["name"], device, config.auth["ver"]))
-        print(" ")
-        
+        pass
+    
+    @event
     def onConnect(self, room):
-        print("Joining to "+room.name)
+        pass
         
+    @event
     def onMessage(self, room, user, message):
-        self.safePrint("[{}] <{}>: {}".format(room.name, user.name, message.body))
         if user == self.user: return
 
         if not message.body.strip(): return
         msgdata = message.body.split(" ",1)
-        if len(msgdata) > 1:
-            cmd, args = msgdata[0], msgdata[1]
+        if len(msgdata) == 2:
+            cmd, args = msgdata
         else:
-            cmd, args = msgdata[0],""
-            cmd = cmd.lower()
+            cmd, args = msgdata[0], ""
+        cmd = cmd.lower()
 
-        
+        if cmd == "@" + self.user.name:
+            msgdata = args.split(" ", 1)
+            if len(msgdata) == 2:
+                cmd, args = msgdata
+            else:
+                cmd, args = msgdata[0], ""
 
-        if cmd[:len(PREFIX)] != PREFIX: return
-        else: cmd = cmd[len(PREFIX):].lower()
+        elif cmd[:len(PREFIX)] == PREFIX:
+            cmd = cmd[len(PREFIX):]
+        else:
+            return
 
-        if cmd not in config.cmds: return
+        if cmd not in config.cmds:
+            return
 
         try:
             exec(config.cmds[cmd])

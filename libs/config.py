@@ -1,6 +1,6 @@
 import json
 import os
-import sysr
+import sys
 
 rooms = []
 auth  = {}

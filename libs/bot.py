@@ -1,9 +1,8 @@
-from . import ch
-from . import config
+import ch
+import config
 
-from .utils import event
+from utils import event
 
-import traceback
 import html
 
 PREFIX = "->" # you can also mention the bot instead of using the prefix
@@ -45,6 +44,12 @@ class Bot(ch.RoomManager):
             return
 
         try:
-            exec(config.cmds[cmd])
+            exec(config.cmds[cmd], locals())
         except BaseException as e:
-            room.message(f'<f x{str(self.user.fontSize).rjust(2, "0")}F00="{self.user.fontFace}"><b>{e.__class__.__name__}</b>: <f x{str(self.user.fontSize).rjust(2, "0")}F00="8"><i>{html.escape(str(e))}</i>', channels=("red",), html=True)
+            fsize = str(self.user.fontSize).rjust(2, "0")
+            fface = self.user.fontFace
+            etype = e.__class__.__name__
+            eargs  = html.escape(str(e))
+            msg = '<f x{}F00="{}"><b>{}</b>: <f x{}F00="8"><i>{}</i>'
+            msg = msg.format(fsize, fface, etype, fsize, eargs)
+            room.message(msg, channels=("red",), html=True)

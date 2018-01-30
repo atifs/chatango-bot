@@ -1,0 +1,5 @@
+hello Hello {}!
+done Done.
+available_languages The available languages are: {}.
+unsupported_language The language {} is unsupported.
+language_changed Language changed successfully to {}.

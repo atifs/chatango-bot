@@ -1,4 +1,9 @@
-from libs import bot, config
+import os
+import sys
+
+sys.path.append(os.path.join(os.getcwd(), "libs"))
+
+import bot, config
 
 def main():
     config.load_all()

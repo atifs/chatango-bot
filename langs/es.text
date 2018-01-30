@@ -1,0 +1,5 @@
+hello Hola {}!
+done Hecho.
+available_languages Los comandos disponibles son: {}.
+unsupported_language El lenguaje {} no es soportado.
+language_changed Lenguaje cambiado exitosamente a {}.

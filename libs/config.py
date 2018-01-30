@@ -5,6 +5,7 @@ import sys
 rooms = []
 auth  = {}
 cmds  = {}
+owners = []
 
 def load_auth():
     auth.clear()
@@ -15,7 +16,14 @@ def load_rooms():
     rooms.clear()
     with open("config/rooms.txt") as file:
         for line in file:
-            rooms.extend(line.split())
+            rooms.extend(x.lower() for x in line.split())
+
+def load_rooms():
+    owners.clear()
+    with open("config/owners.txt") as file:
+        for line in file:
+            owners.extend(x.lower() for x in line.split())
+
 
 def load_cmds():
     cmds.clear()
@@ -28,20 +36,36 @@ def load_cmds():
             except BaseException as e:
                 print("Error loading cmd {}.\n\t{}: {}".format(cmd, e.__class.__.__name__, e), file = sys.stderr)
 
+def save_auth():
+    with open("config/auth.json", "w") as file:
+        json.dump(file, auth)
 
-def save_rooms(room_per_line):
+def save_rooms(rooms_per_line):
     with open("config/rooms.txt", "w") as file:
         for i, room in enumerate(rooms):
             file.write(room)
-            if (i + 1) % room_per_line == 0:
+            if (i + 1) % rooms_per_line == 0:
                 file.write("\n")
-            elif (i + 1) % room_per_line != room_per_line - 1:
+            elif (i + 1) % rooms_per_line != rooms_per_line - 1:
                 file.write(" ")
+
+def save_owners(owners_per_line):
+    with open("config/owners.txt", "w") as file:
+        for i, owner in enumerate(owners):
+            file.write(owner)
+            if (i + 1) % owners_per_line == 0:
+                file.write("\n")
+            elif (i + 1) % owners_per_line != owners_per_line - 1:
+                file.write(" ")
+
 
 def load_all():
     load_auth()
     load_rooms()
     load_cmds()
+    load_owners()
 
 def save_all():
     save_rooms(10)
+    save_owners(10)
+    save_auth()

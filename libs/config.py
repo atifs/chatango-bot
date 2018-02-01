@@ -112,11 +112,13 @@ def get_lang(lang, id):
         return langs[lang][id]
     return "langs[{}][{}]".format(repr(lang), repr(id))
 
-
-
 def get_user(name):
     if name not in users:
         user = {"name": name}
         user.update(users_default)
         users[name] = user
+    else:
+        for k, v in users_default.items():
+            if k not in users[name]:
+                users[name][k] = v
     return users[name]

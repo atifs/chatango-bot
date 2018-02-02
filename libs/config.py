@@ -39,7 +39,7 @@ def load_langs():
                 data = line.strip().split(" ", 1)
                 if len(data) == 1 and data[0]:
                     raise ValueError("Invalid format")
-                if data[0]
+                if data[0]:
                     id, text = data
                     langs[lang][id] = text
 

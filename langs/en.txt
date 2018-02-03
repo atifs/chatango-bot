@@ -3,3 +3,8 @@ done Done.
 available_languages The available languages are: {}.
 unsupported_language The language {} is unsupported.
 language_changed Language changed successfully to {}.
+current_prefix Your current prefix is {!r}.
+prefix_too_long The prefix {!r} has more than 5 characters.
+invalid_prefix The prefix {!r} contains invalid characters.
+new_prefix Your new prefix is {!r}.
+not_for_anons This command can't be used by anons.

@@ -5,7 +5,7 @@ from utils import event
 
 import html
 
-PREFIX = "->" # you can also mention the bot instead of using the prefix
+# PREFIX = "->" # you can also mention the bot instead of using the prefix
 
 class Bot(ch.RoomManager):
     @event
@@ -21,11 +21,14 @@ class Bot(ch.RoomManager):
         if user == self.user: return
 
         if not message.body.strip(): return
+
         msgdata = message.body.split(" ",1)
+
         if len(msgdata) == 2:
             cmd, args = msgdata
         else:
             cmd, args = msgdata[0], ""
+
         cmd = cmd.lower()
 
         if cmd == "@" + self.user.name:
@@ -34,6 +37,11 @@ class Bot(ch.RoomManager):
                 cmd, args = msgdata
             else:
                 cmd, args = msgdata[0], ""
+
+        if user.name[0] in ("#", "!") or user.name not in config.users:
+            PREFIX = config.users_default["prefix"]
+        else:
+            PREFIX = config.get_user(user.name)["prefix"]
 
         elif cmd[:len(PREFIX)] == PREFIX:
             cmd = cmd[len(PREFIX):]

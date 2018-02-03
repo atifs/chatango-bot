@@ -9,7 +9,7 @@ langs = {}
 owners = []
 users = {}
 
-users_default = {"lang": "en"}
+users_default = {"lang": "en", "prefix": "->"}
 
 
 def load_auth():

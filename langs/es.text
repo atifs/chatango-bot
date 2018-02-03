@@ -3,3 +3,8 @@ done Hecho.
 available_languages Los comandos disponibles son: {}.
 unsupported_language El lenguaje {} no es soportado.
 language_changed Lenguaje cambiado exitosamente a {}.
+current_prefix Tu prefijo actual es {!r}.
+prefix_too_long El prefijo no puede contener mas de 5 caracteres.
+invalid_prefix El prefijo contiene caracteres invalidos.
+new_prefix Tu nuevo prefijo es {!r}.
+not_for_anons Este comando no puede ser utilizado por anonimos.

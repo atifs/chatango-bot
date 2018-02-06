@@ -46,7 +46,7 @@ class Bot(ch.RoomManager):
         else:
             PREFIX = config.get_user(user.name)["prefix"]
 
-        elif cmd[:len(PREFIX)] == PREFIX:
+        if cmd[:len(PREFIX)] == PREFIX:
             cmd = cmd[len(PREFIX):]
         else:
             return

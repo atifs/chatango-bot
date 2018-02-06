@@ -31,28 +31,28 @@ class Bot(ch.RoomManager):
             cmd, args = msgdata[0], ""
 
         cmd = cmd.lower()
-        if self.user.name[0] in ("#", "!"):
-            self.anonfix = self.user.name[1:]
-        else:
-            self.anonfix = self.user.name
-
         if user.name[0] in ("#", "!") or user.name not in config.users:
             PREFIX = config.users_default["prefix"]
         else:
             PREFIX = config.get_user(user.name)["prefix"]
-
-        if cmd[:len(PREFIX)] == PREFIX:
-            cmd = cmd[len(PREFIX):]
+        if self.user.name[0] in ("#", "!"):
+            self.anonfix = self.user.name[1:]
         else:
-            pass
-        
+            self.anonfix = self.user.name
         if cmd == "@" + self.anonfix and args:
             cmd1 = True
-            if len(args.split()) > 1:
-                cmd, args = args.split(" ", 1)
+            msgdata = args.split(" ", 1)
+            if len(msgdata) > 1:
+                cmd, args = msgdata[0], msgdata[1]
             else:
-                cmd, args = args[0], ""
+                cmd, args = msgdata, ""
         cmd = cmd.lower()
+
+        elif cmd[:len(PREFIX)] == PREFIX:
+            cmd = cmd[len(PREFIX):]
+        else:
+            return
+       
         if cmd not in config.cmds:
             return
 

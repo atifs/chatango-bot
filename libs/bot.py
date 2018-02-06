@@ -25,7 +25,7 @@ class Bot(ch.RoomManager):
 
         msgdata = message.body.split(" ",1)
 
-        if len(msgdata) == 2:
+        if len(msgdata) > 2:
             cmd, args = msgdata
         else:
             cmd, args = msgdata[0], ""

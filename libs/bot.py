@@ -18,6 +18,7 @@ class Bot(ch.RoomManager):
         
     @event
     def onMessage(self, room, user, message):
+        cmd1 = False
         if user == self.user: return
 
         if not message.body.strip(): return
@@ -39,12 +40,14 @@ class Bot(ch.RoomManager):
         else:
             self.anonfix = self.user.name
         if cmd == "@" + self.anonfix and args:
+            cmd1 = True
             msgdata = args.split(" ", 1)
             if len(msgdata) > 1:
                 cmd, args = msgdata
+                cmd = cmd.lower()
             else:
                 cmd, args = msgdata[0], ""
-            cmd = cmd.lower()
+                cmd = cmd.lower()
 
         elif cmd[:len(PREFIX)] == PREFIX:
             cmd = cmd[len(PREFIX):]

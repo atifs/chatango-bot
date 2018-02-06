@@ -30,7 +30,12 @@ class Bot(ch.RoomManager):
             cmd, args = msgdata[0], ""
 
         cmd = cmd.lower()
-                        
+
+        if user.name[0] in ("#", "!") or user.name not in config.users:
+            PREFIX = config.users_default["prefix"]
+        else:
+            PREFIX = config.get_user(user.name)["prefix"]
+
         if cmd == "@" + self.user.name.replace("#", "").replace("!", ""):
             msgdata = args.split(" ", 1)
             if len(msgdata) == 2:
@@ -38,12 +43,6 @@ class Bot(ch.RoomManager):
             else:
                 cmd, args = msgdata[0], ""
             cmd = cmd.lower()
-
-        if user.name[0] in ("#", "!") or user.name not in config.users:
-            PREFIX = config.users_default["prefix"]
-        else:
-            PREFIX = config.get_user(user.name)["prefix"]
-
         elif cmd[:len(PREFIX)] == PREFIX:
             cmd = cmd[len(PREFIX):]
         else:

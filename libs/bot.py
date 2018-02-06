@@ -26,7 +26,7 @@ class Bot(ch.RoomManager):
         msgdata = message.body.split(" ",1)
 
         if len(msgdata) > 2:
-            cmd, args = msgdata
+            cmd, args = msgdata[0], msgdata[1]
         else:
             cmd, args = msgdata[0], ""
 
@@ -48,7 +48,7 @@ class Bot(ch.RoomManager):
         else:
             PREFIX = config.get_user(user.name)["prefix"]
 
-        if cmd1 == False and cmd[:len(PREFIX)] == PREFIX:
+        if cmd1 == True and cmd[:len(PREFIX)] == PREFIX:
             cmd = cmd[len(PREFIX):]
         else:
             pass

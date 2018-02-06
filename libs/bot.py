@@ -44,9 +44,10 @@ class Bot(ch.RoomManager):
             msgdata = args.split(" ", 1)
             if len(msgdata) > 1:
                 cmd, args = msgdata[0], msgdata[1]
+                cmd = cmd.lower()
             else:
                 cmd, args = msgdata, ""
-        cmd = cmd.lower()
+                cmd = cmd.lower()
 
         elif cmd[:len(PREFIX)] == PREFIX:
             cmd = cmd[len(PREFIX):]

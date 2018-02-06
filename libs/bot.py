@@ -30,8 +30,11 @@ class Bot(ch.RoomManager):
             cmd, args = msgdata[0], ""
 
         cmd = cmd.lower()
-
-        if cmd == "@" + self.user.name.replace("#", "").replace("!", ""):
+        if self.user.name[0] in ("#", "!"):
+            self.anonfix = self.user.name[1:]
+        else:
+            self.anonfix = self.user.name
+        if cmd == "@" + self.anonfix:
             msgdata = args.split(" ", 1)
             if len(msgdata) == 2:
                 cmd, args = msgdata

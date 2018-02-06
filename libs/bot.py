@@ -43,7 +43,7 @@ class Bot(ch.RoomManager):
             cmd1 = True
             msgdata = args.split(" ", 1)
             if len(msgdata) > 1:
-                cmd, args = msgdata[0], msgdata[1]
+                cmd, args = msgdata
                 cmd = cmd.lower()
             else:
                 cmd, args = msgdata, ""

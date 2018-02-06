@@ -18,12 +18,11 @@ class Bot(ch.RoomManager):
         
     @event
     def onMessage(self, room, user, message):
-        cmd1 = False
         if user == self.user: return
 
         if not message.body.strip(): return
 
-        msgdata = message.body.split(" ",1)
+        msgdata = message.body.strip().split(" ",1)
 
         if len(msgdata) == 2:
             cmd, args = msgdata
@@ -31,29 +30,25 @@ class Bot(ch.RoomManager):
             cmd, args = msgdata[0], ""
 
         cmd = cmd.lower()
+                        
+        if cmd == "@" + self.user.name.replace("#", "").replace("!", ""):
+            msgdata = args.split(" ", 1)
+            if len(msgdata) == 2:
+                cmd, args = msgdata
+            else:
+                cmd, args = msgdata[0], ""
+            cmd = cmd.lower()
+
         if user.name[0] in ("#", "!") or user.name not in config.users:
             PREFIX = config.users_default["prefix"]
         else:
             PREFIX = config.get_user(user.name)["prefix"]
-        if self.user.name[0] in ("#", "!"):
-            self.anonfix = self.user.name[1:]
-        else:
-            self.anonfix = self.user.name
-        if cmd == "@" + self.anonfix and args:
-            cmd1 = True
-            msgdata = args.split(" ", 1)
-            if len(msgdata) > 1:
-                cmd, args = msgdata
-                cmd = cmd.lower()
-            else:
-                cmd, args = msgdata[0], ""
-                cmd = cmd.lower()
 
         elif cmd[:len(PREFIX)] == PREFIX:
             cmd = cmd[len(PREFIX):]
         else:
             return
-       
+
         if cmd not in config.cmds:
             return
 

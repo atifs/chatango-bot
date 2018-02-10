@@ -121,7 +121,8 @@ def get_user(name):
     if name not in users:
         user = {"name": name}
         user.update(default_user)
-        users[name] = user
+        if name[0] not in "#!": # don't save anons
+            users[name] = user
     else:
         for k, v in default_user.items():
             if k not in users[name]:

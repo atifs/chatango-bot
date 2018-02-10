@@ -9,8 +9,12 @@ langs = {}
 owners = []
 users = {}
 
-users_default = {"lang": "en", "prefix": "->"}
+default_user = {}
 
+def load_default_user():
+    default_user.clear()
+    with open("config/default_user.json") as file:
+        default_user.update(json.load(file))
 
 def load_auth():
     auth.clear()
@@ -99,6 +103,7 @@ def load_all():
     load_langs()
     load_owners()
     load_cmds()
+    load_default_user()
     load_users()
 
 def save_all():
@@ -115,10 +120,10 @@ def get_lang(lang, id):
 def get_user(name):
     if name not in users:
         user = {"name": name}
-        user.update(users_default)
+        user.update(default_user)
         users[name] = user
     else:
-        for k, v in users_default.items():
+        for k, v in default_user.items():
             if k not in users[name]:
                 users[name][k] = v
     return users[name]

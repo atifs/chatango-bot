@@ -860,7 +860,7 @@ class Room:
     for x in channels:
       if isinstance(x, int) and x in Channels.values():
         self._channels |= x
-      else if isinstance(x, (str, bytes)) and x.lower() in Channels.keys():
+      elif isinstance(x, (str, bytes)) and x.lower() in Channels.keys():
         self._channels |= Channels[x.lower()]
 
   name = property(_getName)

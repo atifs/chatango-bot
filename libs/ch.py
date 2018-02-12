@@ -56,6 +56,8 @@ if sys.version_info[0] < 3:
     parse = __import__("urllib")
     request = __import__("urllib2")
   input = raw_input
+  bytes = str
+  str = unicode
   import codecs
   import Queue as queue
 else:
@@ -748,6 +750,7 @@ class Room:
     self._silent = False
     self._banlist = dict()
     self._unbanlist = dict()
+    self._channels = 0
 
     # Inited vars
     if self._mgr: self._connect()
@@ -851,6 +854,14 @@ class Room:
   def _setSilent(self, val): self._silent = val
   def _getBanlist(self): return list(self._banlist.keys())
   def _getUnBanlist(self): return [[record["target"], record["src"]] for record in self._unbanlist.values()]
+  def _getChannels(self): return tuple(x for x, y in Channels.items() if self._channels & y)
+  def _setChannels(self, channels):
+    self._channels = 0
+    for x in channels:
+      if isinstance(x, int) and x in Channels.values():
+        self._channels |= x
+      else if isinstance(x, (str, bytes)) and x.lower() in Channels.keys():
+        self._channels |= Channels[x.lower()]
 
   name = property(_getName)
   botname = property(_getBotName)
@@ -867,6 +878,7 @@ class Room:
   silent = property(_getSilent, _setSilent)
   banlist = property(_getBanlist)
   unbanlist = property(_getUnBanlist)
+  channels = property(_getChannels, _setChannels)
 
   ####
   # Feed/process
@@ -1254,8 +1266,9 @@ class Room:
       font_properties = "<f x%0.2i%s=\"%s\">" %(self.user.fontSize, self.user.fontColor, self.user.fontFace)
       msg = font_properties + msg
     msg.replace("~","&#126;")
+    _channel = _channel or self._channels
     if _channel:
-        self._sendCommand("bm","ibrs",str(_channel), msg)
+        self._sendCommand("bm","ibrs", str(_channel), msg)
     else:
         self.rawMessage(msg)
 

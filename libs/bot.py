@@ -14,7 +14,8 @@ class Bot(ch.RoomManager):
     
     @event
     def onConnect(self, room):
-        pass
+        croom = config.get_room(room.name)
+        room.channels = tuple(croom.channels)
         
     @event
     def onMessage(self, room, user, message):

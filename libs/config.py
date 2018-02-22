@@ -2,19 +2,26 @@ import json
 import os
 import sys
 
-rooms = []
+rooms = [] # the list of rooms that the bot ´should´ be in
 auth  = {}
 cmds  = {}
 langs = {}
 owners = []
 users = {}
+rooms_config = {} # same as users, but for rooms
 
+default_room = {}
 default_user = {}
 
 def load_default_user():
     default_user.clear()
     with open("config/default_user.json") as file:
         default_user.update(json.load(file))
+
+def load_default_room():
+    default_room.clear()
+    with open("config/default_room.json") as file:
+        default_room.update(json.load(file))
 
 def load_auth():
     auth.clear()
@@ -62,6 +69,13 @@ def load_cmds():
                 msg = msg.format(cmd, ename, eargs)
                 print(msg, file = sys.stderr)
 
+def load_rooms_config():
+    rooms_config.clear()
+    for path in os.scandir("rooms/"):
+        name = os.path.splitext(os.path.split(path.path)[1])[0].lower()
+        with open(path.path, encoding = "utf-8") as file:
+            rooms_config[name] = json.load(file)
+
 def load_users():
     users.clear()
     for path in os.scandir("users/"):
@@ -93,9 +107,15 @@ def save_owners(owners_per_line):
 
 def save_users():
     for name, val in users.items():
-        with open(os.path.join("users", name + ".json"), "w", encoding = "utf-8") as file:
+        path = os.path.join("users", name + ".json")
+        with open(path, "w", encoding = "utf-8") as file:
             json.dump(val, file)
 
+def save_rooms_config():
+    for name, val in rooms.config.items():
+        path = os.path.join("rooms", name + ".json")
+        with open(path, "w", encoding = "utf-8") as file:
+            json.dump(val, file)
 
 def load_all():
     load_auth()
@@ -105,12 +125,15 @@ def load_all():
     load_cmds()
     load_default_user()
     load_users()
+    load_default_room()
+    load_rooms_config()
 
 def save_all():
     save_rooms(10)
     save_owners(10)
     save_auth()
     save_users()
+    save_rooms_config()
 
 def get_lang(lang, id):
     if lang in langs and id in langs[lang]:
@@ -128,3 +151,16 @@ def get_user(name):
             if k not in users[name]:
                 users[name][k] = v
     return users[name]
+
+def get_room(name):
+    if name not in rooms_config:
+        room = {"name": name}
+        room.update(default_room)
+        rooms_config[name] = room
+    else:
+        for k, v in default_room.items():
+            if k not in rooms_config[name]:
+                rooms_config[name][k] = v
+    return rooms_config[name]
+
+

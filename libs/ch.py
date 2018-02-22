@@ -42,11 +42,12 @@ import random
 import re
 import sys
 import select
+import _ws
 
 ################################################################
 # Debug stuff
 ################################################################
-debug = False
+debug = True
 
 ################################################################
 # Python 2 compatibility
@@ -721,7 +722,7 @@ class Room:
     # Basic stuff
     self._name = room
     self._server = server or getServer(room)
-    self._port = port or 443
+    self._port = port or 8080
     self._mgr = mgr
 
     # Under the hood
@@ -751,6 +752,7 @@ class Room:
     self._banlist = dict()
     self._unbanlist = dict()
     self._channels = 0
+    self._headers_parsed = False
 
     # Inited vars
     if self._mgr: self._connect()
@@ -764,10 +766,20 @@ class Room:
     self._sock.connect((self._server, self._port))
     self._sock.setblocking(False)
     self._firstCommand = True
-    self._wbuf = b""
-    self._auth()
-    self._pingTask = self.mgr.setInterval(self.mgr._pingDelay, self.ping)
-    if not self._reconnecting: self.connected = True
+    self.connected = False
+    self._wbuf = (
+                    b"GET / HTTP/1.1\r\n"
+                    b"Host: " + "{}:{}".format(self._server, self._port).encode() + b"\r\n"
+                    b"Origin: http://st.chatango.com\r\n"
+                    b"Connection: Upgrade\r\n"
+                    b"Upgrade: websocket\r\n"
+                    b"Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+                    b"Sec-WebSocket-Version: 13\r\n"
+                    b"\r\n"
+                 )
+
+    #self._auth()
+    #
 
   def reconnect(self):
     """Reconnect."""
@@ -789,13 +801,15 @@ class Room:
 
   def _disconnect(self):
     """Disconnect from the server."""
-    if not self._reconnecting: self.connected = False
+    if not self._reconnecting:
+        self.connected = False
     for user in self._userlist:
       user.clearSessionIds(self)
     self._userlist = list()
-    self._pingTask.cancel()
-    self._sock.close()
-    if not self._reconnecting: del self.mgr._rooms[self.name]
+    # self._pingTask.cancel()
+    self._sock.close() 
+    if not self._reconnecting and self.name in self.mgr._rooms:
+        del self.mgr._rooms[self.name]
 
   def _auth(self):
     """Authenticate."""
@@ -891,11 +905,31 @@ class Room:
     @param data: data to be fed
     """
     self._rbuf += data
-    while self._rbuf.find(b"\x00") != -1:
-      data = self._rbuf.split(b"\x00")
-      for food in data[:-1]:
-        self._process(food.decode(errors="replace").rstrip("\r\n"))
-      self._rbuf = data[-1]
+
+    if not self._headers_parsed and b"\r\n\r\n" in self._rbuf:
+        headers, _, self._rbuf = self._rbuf.partition(b"\r\n\r\n")
+        self._headers_parsed = True
+        key = _ws.check_headers(headers)
+        if key != "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=":
+            self._disconnect()
+            self._callEvent("onConnectFail")
+        else:
+            self._auth()
+            self._connected = True
+    else:
+        r = _ws.check_frame(self._rbuf)
+        while r:
+            frame = self._rbuf[:r]
+            self._rbuf = self._rbuf[r:]
+            info = _ws.frame_info(frame)
+            payload = _ws.get_payload(frame)
+            if info.opcode == _ws.CLOSE: # server wants to close connection
+                self.disconnect()
+            elif info.opcode == _ws.TEXT: # actual data
+                self._process(payload)
+            elif debug:
+                print("unhandled frame: " + repr(info) + " with payload " + repr(payload))
+            r = _ws.check_frame(self._rbuf)
 
   def _process(self, data):
     """
@@ -909,10 +943,9 @@ class Room:
     cmd, args = data[0], data[1:]
     func = "_rcmd_" + cmd
     if hasattr(self, func):
-      getattr(self, func)(args)
-    else:
-      if debug:
-        print("unknown data: "+str(data))
+        getattr(self, func)(args)
+    elif debug:
+        print("unknown data: " + str(data))
 
   ####
   # Received Commands
@@ -940,6 +973,7 @@ class Room:
     self._aid = args[1][4:8]
     self._mods = set(map(lambda x: User(x.split(",")[0]), args[6].split(";")))
     self._i_log = list()
+    self._pingTask = self.mgr.setInterval(self.mgr._pingDelay, self.ping)
 
   def _rcmd_denied(self, args):
     self._disconnect()
@@ -961,6 +995,9 @@ class Room:
       self._callEvent("onReconnect")
     self._connectAmmount += 1
     self._setWriteLock(False)
+
+  def _rcmd_(self, args): # pong
+    self._callEvent("onPong")
 
   def _rcmd_premium(self, args):
     if float(args[1]) > time.time():
@@ -1494,11 +1531,14 @@ class Room:
     @param args: command and list of arguments
     """
     if self._firstCommand:
-      terminator = b"\x00"
-      self._firstCommand = False
+        terminator = "\x00"
+        self._firstCommand = False
     else:
-      terminator = b"\r\n\x00"
-    self._write(":".join(args).encode() + terminator)
+        terminator = "\r\n\x00"
+
+    payload = ":".join(args) + terminator
+
+    self._write( _ws.encode_frame(mask = True, payload = payload) )
 
   def getLevel(self, user):
     """get the level of user in a room"""
@@ -1865,6 +1905,15 @@ class RoomManager:
   def onPing(self, room):
     """
     Called when a ping gets sent.
+
+    @type room: Room
+    @param room: room where the event occured
+    """
+    pass
+
+  def onPong(self, room):
+    """
+    Called when a pong it's received.
 
     @type room: Room
     @param room: room where the event occured

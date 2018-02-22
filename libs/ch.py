@@ -47,7 +47,7 @@ import _ws
 ################################################################
 # Debug stuff
 ################################################################
-debug = True
+debug = False
 
 ################################################################
 # Python 2 compatibility
@@ -930,7 +930,6 @@ class Room:
             elif debug:
                 print("unhandled frame: " + repr(info) + " with payload " + repr(payload))
             r = _ws.check_frame(self._rbuf)
-
   def _process(self, data):
     """
     Process a command string.

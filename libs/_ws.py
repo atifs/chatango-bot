@@ -1,8 +1,6 @@
-# File: _ws.py
-# By: TheClonerx
-
 import collections
 import os
+
 import hashlib
 import base64
 
@@ -30,7 +28,6 @@ def check_frame(buff):
     payload_length = 0
 
     if buff[1] & 128:
-        print("masked")
         min_size += 4
         masked = True
 
@@ -42,10 +39,10 @@ def check_frame(buff):
             return False
         payload_length += int.from_bytes(buff[2:4], "big")
     elif (buff[1] & 127) == 127:
-        min_size += 4;
-        if len(buff) < 6:
+        min_size += 8
+        if len(buff) < 10:
             return False
-        payload_length += int.from_bytes(buff[2:6], "big")
+        payload_length += int.from_bytes(buff[2:10], "big")
     if len(buff) < (min_size + payload_length):
         return False
     return min_size + payload_length
@@ -63,20 +60,36 @@ def frame_info(buff):
     elif (buff[1] & 127) == 126:
         payload_length += int.from_bytes(buff[2:4], "big")
     elif (buff[1] & 127) == 127:
-        payload_length += int.from_bytes(buff[2:6], "big")
+        payload_length += int.from_bytes(buff[2:10], "big")
 
-    return FrameInfo(bool(buff[0] & 128), buff[0] & 127, bool(buff[1] & 128), payload_length)
+    return FrameInfo(bool(buff[0] & 128), buff[0] & 15, bool(buff[1] & 128), payload_length)
+
+def get_frames(buff):
+    frames = []
+
+    begin = 0
+    end = check_frame(buff)
+    while end:
+        if end != len(buff):
+            print(end, len(buff))
+        frames.append(buff[begin:end])
+        begin = end
+        end = check_frame(buff[end:])
+        
+    return frames
 
 def check_msg(buff):
     """
     returns True  if the buffer starts with a full fragmented message, or a unfragmented frame
-    returns False otherwise
+    returns where the las frame ends
 
     """
     r = check_frame(buff)
+    s = 0
     while r:
+        s += r
         if frame_info(buff)[0]:
-            return True
+            return s
     return False
 
 def mask_buff(buff):
@@ -144,7 +157,7 @@ def get_payload(buff):
     """
     gets the payload of a frame
     if the payload is masked, it will unmask it
-    if the opcode is text, a str is returned
+    if the opcode is text and fin is True, a str is returned
     if opcode is close, a tuple of code and message is returned
         (if the frame doens't contains a payload, (0, "") is returned)
     returns a bytes object otherwise
@@ -157,7 +170,7 @@ def get_payload(buff):
     else:
         payload = buff[-(info[3]):]
 
-    if info[1] == TEXT:
+    if info[1] == TEXT and info.fin:
         return payload.decode("utf-8", "replace")
     elif info[1] == CLOSE:
         return int.from_bytes(payload[:2], "big"), payload[2:].decode("utf-8", "replace")

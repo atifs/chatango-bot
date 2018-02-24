@@ -43,6 +43,7 @@ import re
 import sys
 import select
 import _ws
+import html
 
 ################################################################
 # Debug stuff
@@ -105,7 +106,7 @@ def getServer(group):
 
   @type group: str
   @param group: room name
-  
+
   @rtype: str
   @return: the server's hostname
   """
@@ -161,11 +162,7 @@ def _clean_message(msg):
   msg = re.sub("<n.*?/>", "", msg)
   msg = re.sub("<f.*?>", "", msg)
   msg = _strip_html(msg)
-  msg = msg.replace("&lt;", "<")
-  msg = msg.replace("&gt;", ">")
-  msg = msg.replace("&quot;", "\"")
-  msg = msg.replace("&apos;", "'")
-  msg = msg.replace("&amp;", "&")
+  msg = html.unescape(msg)
   return msg, n, f
 
 def _strip_html(msg):
@@ -180,6 +177,8 @@ def _strip_html(msg):
       if len(data) == 1:
         ret.append(data[0])
       elif len(data) == 2:
+        if data[0].startswith("br"):
+            ret.append("\n")
         ret.append(data[1])
     return "".join(ret)
 
@@ -303,7 +302,7 @@ class _ANON_PM_OBJECT:
   def _rcmd_mhs(self, args):
     """
     note to future maintainers
-    
+
     args[1] is ether "online" or "offline"
     """
     self._connected = True
@@ -807,7 +806,7 @@ class Room:
       user.clearSessionIds(self)
     self._userlist = list()
     # self._pingTask.cancel()
-    self._sock.close() 
+    self._sock.close()
     if not self._reconnecting and self.name in self.mgr._rooms:
         del self.mgr._rooms[self.name]
 
@@ -933,7 +932,7 @@ class Room:
   def _process(self, data):
     """
     Process a command string.
-    
+
     @type data: str
     @param data: the command string
     """
@@ -1276,7 +1275,7 @@ class Room:
             _channel |= Channels.get(channel.lower(), 0)
     elif isinstance(channels, str):
         _channel |= Channels.get(channels.lower(), 0)
-    
+
     if isinstance(badge, int):
         _channel |= badge
     else:
@@ -1566,7 +1565,7 @@ class Room:
 
   def findUser(self, name):
     """check if user is in the room
-    
+
     return User(name) if name in room else None"""
     name = name.lower()
     ul = self._getUserlist()
@@ -1738,7 +1737,7 @@ class RoomManager:
   def onReconnect(self, room):
     """
     Called when reconnected to the room.
-    
+
     @type room: Room
     @param room: room where the event occured
     """
@@ -1747,7 +1746,7 @@ class RoomManager:
   def onConnectFail(self, room):
     """
     Called when the connection failed.
-    
+
     @type room: Room
     @param room: room where the event occured
     """
@@ -1756,7 +1755,7 @@ class RoomManager:
   def onDisconnect(self, room):
     """
     Called when the client gets disconnected.
-    
+
     @type room: Room
     @param room: room where the event occured
     """
@@ -1765,7 +1764,7 @@ class RoomManager:
   def onLoginFail(self, room):
     """
     Called on login failure, disconnects after.
-    
+
     @type room: Room
     @param room: room where the event occured
     """
@@ -1774,7 +1773,7 @@ class RoomManager:
   def onFloodBan(self, room):
     """
     Called when either flood banned or flagged.
-    
+
     @type room: Room
     @param room: room where the event occured
     """
@@ -1940,7 +1939,7 @@ class RoomManager:
     @param target: user that got banned
     """
     pass
- 
+
   def onUnban(self, room, user, target):
     """
     Called when a user gets unbanned.
@@ -1975,7 +1974,7 @@ class RoomManager:
   def onPMConnect(self, pm):
     """
     Called when connected to the pm
-    
+
     @type pm: PM
     @param pm: the pm
     """
@@ -1984,7 +1983,7 @@ class RoomManager:
   def onAnonPMDisconnect(self, pm, user):
     """
     Called when disconnected from the pm
-    
+
     @type pm: PM
     @param pm: the pm
     """
@@ -1993,7 +1992,7 @@ class RoomManager:
   def onPMDisconnect(self, pm):
     """
     Called when disconnected from the pm
-    
+
     @type pm: PM
     @param pm: the pm
     """
@@ -2002,7 +2001,7 @@ class RoomManager:
   def onPMPing(self, pm):
     """
     Called when sending a ping to the pm
-    
+
     @type pm: PM
     @param pm: the pm
     """
@@ -2011,7 +2010,7 @@ class RoomManager:
   def onPMMessage(self, pm, user, body):
     """
     Called when a message is received
-    
+
     @type pm: PM
     @param pm: the pm
     @type user: User
@@ -2024,7 +2023,7 @@ class RoomManager:
   def onPMOfflineMessage(self, pm, user, body):
     """
     Called when connected if a message is received while offline
-    
+
     @type pm: PM
     @param pm: the pm
     @type user: User
@@ -2037,7 +2036,7 @@ class RoomManager:
   def onPMContactlistReceive(self, pm):
     """
     Called when the contact list is received
-    
+
     @type pm: PM
     @param pm: the pm
     """
@@ -2046,7 +2045,7 @@ class RoomManager:
   def onPMBlocklistReceive(self, pm):
     """
     Called when the block list is received
-    
+
     @type pm: PM
     @param pm: the pm
     """
@@ -2055,7 +2054,7 @@ class RoomManager:
   def onPMContactAdd(self, pm, user):
     """
     Called when the contact added message is received
-    
+
     @type pm: PM
     @param pm: the pm
     @type user: User
@@ -2066,7 +2065,7 @@ class RoomManager:
   def onPMContactRemove(self, pm, user):
     """
     Called when the contact remove message is received
-    
+
     @type pm: PM
     @param pm: the pm
     @type user: User
@@ -2077,7 +2076,7 @@ class RoomManager:
   def onPMBlock(self, pm, user):
     """
     Called when successfully block a user
-    
+
     @type pm: PM
     @param pm: the pm
     @type user: User
@@ -2088,7 +2087,7 @@ class RoomManager:
   def onPMUnblock(self, pm, user):
     """
     Called when successfully unblock a user
-    
+
     @type pm: PM
     @param pm: the pm
     @type user: User
@@ -2099,7 +2098,7 @@ class RoomManager:
   def onPMContactOnline(self, pm, user):
     """
     Called when a user from the contact come online
-    
+
     @type pm: PM
     @param pm: the pm
     @type user: User
@@ -2110,7 +2109,7 @@ class RoomManager:
   def onPMContactOffline(self, pm, user):
     """
     Called when a user from the contact go offline
-    
+
     @type pm: PM
     @param pm: the pm
     @type user: User
@@ -2354,7 +2353,7 @@ class RoomManager:
     @type face: str
     @param face: the font face
     """
-    self.user._fontFace = face
+    self.user._fontFace = str(face)
 
   def setFontSize(self, size):
     """
@@ -2373,13 +2372,13 @@ class RoomManager:
 _users = dict()
 def User(name, *args, **kw):
   if name == None: name = ""
+  capser = name
   name = name.lower()
   user = _users.get(name)
   if not user:
     user = _User(name = name, *args, **kw)
     _users[name] = user
-  if not name.islower():
-    user.capser = name
+  user.capser = capser
   return user
 
 class _User:
@@ -2536,7 +2535,7 @@ class Message:
   def _getRaw(self): return self._raw
   def _getUnid(self): return self._unid
   def _getPuid(self): return self._puid
-  
+
 
   msgid = property(_getId)
   time = property(_getTime)

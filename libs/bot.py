@@ -18,24 +18,29 @@ class Bot(ch.RoomManager):
         room.channels = tuple(croom.channels)
         
     @event
-    def onMessage(self, room, user, message):
-        if user == self.user: return
+    def onMessage(self, room, user, message):        if user == self.user: return
 
         if not message.body.strip(): return
 
         msgdata = message.body.strip().split(" ",1)
+
+        if user.name not in config.users:
+            PREFIX = config.default_user["prefix"]
+        else:
+            PREFIX = config.get_user(user.name)["prefix"]
 
         if len(msgdata) == 2:
             cmd, args = msgdata
         else:
             cmd, args = msgdata[0], ""
 
-        if user.name[0] in ("#", "!") or user.name not in config.users:
-            PREFIX = config.users_default["prefix"]
-        else:
-            PREFIX = config.get_user(user.name)["prefix"]
-
-        if cmd.lower() == "@" + self.user.name.replace("#", "").replace("!", ""):
+        if cmd == PREFIX:
+            msgdata = args.split(" ",1)
+            if len(msgdata) == 2:
+                cmd, args = msgdata
+            else:
+                cmd, args = msgdata[0], ""
+        elif cmd.lower() == "@" + self.user.name.replace("#", "").replace("!", ""):
             msgdata = args.split(" ", 1)
             if len(msgdata) == 2:
                 cmd, args = msgdata
@@ -47,7 +52,7 @@ class Bot(ch.RoomManager):
         else:
             return
 
-        cmd = cmd.lower()
+        cmd = cmd.lower().strip()
 
         if cmd not in config.cmds:
             return
@@ -56,9 +61,10 @@ class Bot(ch.RoomManager):
             exec(config.cmds[cmd], locals())
         except BaseException as e:
             fsize = str(self.user.fontSize).rjust(2, "0")
-            fface = self.user.fontFace
+            fcolor = self.user.fontColor
             etype = e.__class__.__name__
             eargs  = html.escape(str(e))
-            msg = '<f x{}F00="{}"><b>{}</b>: <f x{}F00="8"><i>{}</i>'
-            msg = msg.format(fsize, fface, etype, fsize, eargs)
-            room.message(msg, channels=("red",), html=True)
+            msg = '<b>{}</b>: <f x{}{}="8"><i>{}</i>'
+            msg = msg.format(etype, fsize, fcolor, eargs)
+            traceback.print_exc()
+            room.message(msg, html=True)

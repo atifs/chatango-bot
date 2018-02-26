@@ -63,7 +63,7 @@ def load_cmds():
             try:
                 cmds[cmd] = compile(file.read(), path, "exec")
             except BaseException as e:
-                ename = e.__class.__.__name__
+                ename = e.__class__.__name__
                 eargs = str(e)
                 msg = "Error loading cmd {}.\n\t{}: {}"
                 msg = msg.format(cmd, ename, eargs)
